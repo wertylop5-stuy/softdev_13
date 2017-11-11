@@ -22,7 +22,7 @@ def callApi(apiKey):
 def getLoginLink(redirect_url):
 	return """
 https://www.facebook.com/
-v2.11/dialog/oauth?client_id=%s&redirect_uri=%s"""%(
+v2.11/dialog/oauth?client_id=%s&redirect_uri=%s&scope=user_birthday,email,user_location"""%(
 	app_id, redirect_url)
 
 def codeToToken(redirect_url, code):
@@ -48,10 +48,10 @@ client_id=%s
 	
 	return json.loads(u.read())
 
-def getProfilePic():
-	u = urllib2.urlopen("https://graph.facebook.com/me?access_token=%s&fields=profile_pic"%(session["access_token"]) )
+def getData():
+	u = urllib2.urlopen("https://graph.facebook.com/me?access_token=%s&fields=birthday,location,name"%(session["access_token"]) )
 	
-	return json.dumps(u.read())
+	return json.loads(u.read())
 
 @app.route("/nasa")
 def nasa():
@@ -82,8 +82,8 @@ def root():
 def profile():
 	if not "access_token" in session:
 		return redirect(url_for("root"))
-	profile_pic = getProfilePic()
-	return render_template("profile.html", pic=profile_pic)
+	data = getData()
+	return render_template("profile.html", bday=data["birthday"], user_name=data["name"], loc=data["location"]["name"])
 
 if __name__ == "__main__":
 	app.debug = True
