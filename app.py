@@ -69,8 +69,12 @@ def getProfPic():
 def nasa():
 	data = callApi("kLf6LgwimzxpO917Kpurrjpcsp1DkgThHaeayMsW")
 	
+	copyright = ""
+	if "copyright" in data:
+		copyright = data["copyright"]
+	
 	return render_template("stars.html", date=data["date"], title=data["title"],
-		image_url=data["url"], copyright=data["copyright"],
+		image_url=data["url"], copyright=copyright,
 		explanation=data["explanation"])
 
 
