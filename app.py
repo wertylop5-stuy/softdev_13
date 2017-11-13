@@ -49,9 +49,21 @@ client_id=%s
 	return json.loads(u.read())
 
 def getData():
+	u = urllib2.urlopen("https://graph.facebook.com/me?access_token=%s&fields=birthday,location,name,email"%(session["access_token"]) )
+	
+	return json.loads(u.read())
+
+def getEmail():
 	u = urllib2.urlopen("https://graph.facebook.com/me?access_token=%s&fields=birthday,location,name"%(session["access_token"]) )
 	
 	return json.loads(u.read())
+
+
+def getProfPic():
+	u = urllib2.urlopen("https://graph.facebook.com/me/picture?access_token=%s&type=large"%(session["access_token"]) )
+	
+	print u.geturl()
+	return u.geturl()
 
 @app.route("/nasa")
 def nasa():
@@ -83,7 +95,35 @@ def profile():
 	if not "access_token" in session:
 		return redirect(url_for("root"))
 	data = getData()
-	return render_template("profile.html", bday=data["birthday"], user_name=data["name"], loc=data["location"]["name"])
+	picData = getProfPic()
+	
+	print data
+	
+	bday = "(Could not view)"
+	name = "(Could not view)"
+	loc = "(Could not view)"
+	email = "(Could not view)"
+	pic = ""
+	
+	#strange, because i should've requested the appropiate perms already
+	if "birthday" in data:
+		bday = data["birthday"]
+	
+	if "name" in data:
+		name = data["name"]
+	
+	if "location" in data:
+		loc = data["location"]["name"]
+	
+	if "email" in data:
+		email = data["email"]
+	
+	if picData != "":
+		pic = picData
+
+	
+	return render_template("profile.html", bday=bday,
+		user_name=name, loc=loc, email=email, pic=pic)
 
 if __name__ == "__main__":
 	app.debug = True
